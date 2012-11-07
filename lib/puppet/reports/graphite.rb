@@ -23,11 +23,12 @@ Puppet::Reports.register_report(:graphite) do
 
   def process
     Puppet.debug "Sending status for #{self.host} to Graphite server at #{GRAPHITE_SERVER}"
-    prefix = self.host.split(".").reverse.join(".")
+    prefix = "puppet.#{self.host}"
     epochtime = Time.now.utc.to_i
     self.metrics.each { |metric,data|
       data.values.each { |val| 
-        name = "#{prefix}.puppet.#{val[1]}_#{metric}"
+        name = "#{prefix}.#{val[1]}_#{metric}"
+        name.gsub!(/ /, '_')
         value = val[2]
 
         send_metric "#{name} #{value} #{epochtime}"
